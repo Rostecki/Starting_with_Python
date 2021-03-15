@@ -1,0 +1,125 @@
+import random, sqlite3
+
+class Account:
+    def __init__(self):
+        self.list_of_account = {}
+        self.key = None
+        self.pin = None
+        self.balance = 0
+        self.checksum = None
+        self.key15 = None
+        # database
+        self.conn = sqlite3.connect('card.s3db')
+        self.cur = self.conn.cursor()
+        self.cur.execute("""Create table if not exists card(
+                         id integer Primary Key,
+                         number text,
+                         pin text,
+                         balance Integer Default 0);""")
+
+    def new_account(self):
+        self.key = "400000" + ''.join([str(random.randint(0,9)) for _ in range(9)])
+        self.pin = ''.join([str(random.randint(0,9)) for _ in range(4)])
+        self.key15 = self.key
+        self.key = [ 2 * int(x) if i % 2 == 0 else int(x) for i, x in enumerate(self.key)]
+        self.key = [ x - 9 if x > 9 else x for x in  self.key]
+        self.checksum = 0 if sum(self.key) % 10 == 0 else (10 - sum(self.key) % 10 )
+        self.key = self.key15 + str(self.checksum)
+        # database
+        self.cur.execute("INSERT INTO card(number, pin) VALUES(?,?)", (self.key, self.pin))
+        self.conn.commit()
+        # self.conn.close()
+
+        # self.list_of_account[self.key] = self.pin
+        return print(f"Your card has been created\nYour card number:\n{self.key}\nYour card PIN:\n{self.pin}\n")
+
+    def if_exist(self, card_number, pin_number):
+        result_card = self.cur.execute('SELECT number FROM card WHERE number = ?', (card_number,)).fetchone()
+        result_pin = self.cur.execute('Select pin FROM card WHERE number = ? and pin = ?', (card_number, pin_number)).fetchone()
+        # print(self.cur.fetchone()
+        if result_card == None or result_pin == None:
+            return print("Wrong card number or PIN!")
+        else:
+            if result_card[0] != card_number:
+                return print("Wrong card number or PIN!")
+            else:
+                if result_pin[0] != pin_number:
+                    return print("Wrong card number or PIN!")
+                else:
+                    return "You have successfully logged in!"
+
+    def check_balance(self, card_number):
+        self.balance = self.cur.execute('SELECT balance FROM card WHERE number = ?', (card_number,)).fetchone()
+        return print(f"\nBalance: {self.balance[0]}")
+
+    def add_income(self, card_number):
+        income = int(input('Enter income:\n'))
+        self.cur.execute("UPDATE card SET balance = balance + ? where number = ?", (income, card_number))
+        self.conn.commit()
+        return print('Income was added!')
+
+    def close(self, card_number):
+        self.cur.execute('DELETE from card where number = ?', (card_number,))
+        self.conn.commit()
+        return print('The account has been closed!')
+
+    def transfer(self, card_number):
+        number_to_check = input('Transfer\nEnter card number:\n')
+        # luhn algorithm
+        key15 = number_to_check[:15]
+        key15 = [2 * int(x) if i % 2 == 0 else int(x) for i, x in enumerate(key15)]
+        key15 = [x - 9 if x > 9 else x for x in key15]
+        checksum = 0 if sum(key15) % 10 == 0 else (10 - sum(key15) % 10)
+        nkey = number_to_check[:15] + str(checksum)
+        if nkey != number_to_check:
+            return print("Probably you made a mistake in the card number. Please try again!")
+
+        transfer_number = self.cur.execute("SELECT number FROM card WHERE number = ?", (number_to_check,)).fetchone()
+        if transfer_number == None:
+            return print('Such a card does not exist.')
+        elif transfer_number[0] == card_number:
+            return print("You can't transfer money to the same account!")
+        else:
+            transfered_money = int(input('Enter how much money you want to transfer:\n'))
+            money_on_account = self.cur.execute('SELECT balance FROM card WHERE number = ?', (card_number,)).fetchone()
+            if transfered_money > money_on_account[0]:
+                print('Not enough money!')
+            else:
+                self.cur.execute("UPDATE card SET balance = balance + ? where number = ?", (transfered_money, number_to_check))
+                self.cur.execute("UPDATE card SET balance = balance - ? where number = ?", (transfered_money, card_number))
+                self.conn.commit()
+                return print('Success!')
+
+
+new = Account()
+choice = None
+while choice != 0:
+    print("1. Create an account\n2. Log into account\n0. Exit\n")
+    choice = int(input())
+    if choice == 1:
+        new.new_account()
+    elif choice == 2:
+        key = input("Enter your card number:\n")
+        pin = input("Enter your PIN:\n")
+        if (new.if_exist(key, pin)) == "You have successfully logged in!":
+            print("\nYou have successfully logged in!")
+            while True:
+                print("\n1. Balance\n2. Add income\n3. Do transfer\n4. Close account\n5. Log out\n0. Exit\n")
+                choice = int(input())
+                if choice == 1:
+                    new.check_balance(key)
+                if choice == 2:
+                    new.add_income(key)
+                if choice == 3:
+                    new.transfer(key)
+                if choice == 4:
+                    new.close(key)
+                    break
+                if choice == 0:
+                    print("Bye!")
+                    exit()
+                if choice == 5:
+                    break
+    elif choice == 3:
+        print("\nBye!")
+        break
