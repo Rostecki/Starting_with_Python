@@ -1,0 +1,83 @@
+import math
+import argparse
+
+# creating and adding parser
+parser = argparse.ArgumentParser()
+parser.add_argument("--type")
+parser.add_argument("--principal")
+parser.add_argument("--periods")
+parser.add_argument("--payment")
+parser.add_argument("--interest")
+# reading values
+args = parser.parse_args()
+
+calculation = [args.type, args.principal, args.periods, args.payment, args.interest]
+#calculation = ['annuity', 500000, 'None' , 23000, 7.8]
+#print(calculation)
+
+if calculation[0] in ['annuity', 'diff']:
+  if calculation[0] == "diff" and calculation[3] != None:
+    print("Incorrect parameters")
+  else:
+    if calculation[4] != None:
+      if calculation.count(None) == 1:
+        negatives = [float(x) if x != None else 0 for x in calculation[1:5]]
+        #negatives = [int(x) for x in negatives]
+        counter = 0
+        for i in range(0, 4):
+          if negatives[i] < 0:
+            counter += 1
+        if counter == 0:
+          # calculating diff
+          interest = float(float(calculation[4]) / (12 *100))
+          if calculation[0] == "diff":
+            summary = 0
+            P = float(calculation[1])
+            n = int(calculation[2])
+            m = n
+            for i in range(1, n+1):
+              payment = (P / m) + interest * (P - (P*(i - 1) / m))
+              summary = summary + math.ceil(payment)
+              print(f"Month {i}: payment is {math.ceil(payment)}")
+            print(f"\nOverpayment = {round(summary - P)}")
+          
+          # calculating annuity          
+          elif calculation[0] == "annuity" and calculation[1] == None:
+            annuity = float(calculation[3])
+            p = int(calculation[2])
+            result = annuity / ((interest * math.pow((1 + interest), p)) / (pow((1 + interest), p) - 1))
+            print(f"Your loan principal = {int(result)}!")
+            print (f"Overpayment = {math.ceil(p * annuity - result)}")
+
+          elif calculation[0] == "annuity" and calculation[2] == None:
+            loan_principal = float(calculation[1])
+            m = int(calculation[3])  
+            sum_of_months = math.log(m / (m - interest * loan_principal), 1 + interest)
+            sum_of_months = math.ceil(sum_of_months) 
+            month = "month" if sum_of_months % 12 == 1 else "months"
+            year = "year" if sum_of_months / 12 == 0 else "years"
+            # checkind conditions
+            if sum_of_months <= 11:
+              print(f"It will take {sum_of_months} {month} to repay the loan!")
+            elif sum_of_months % 12 == 0:
+              print(f"It will take {int(sum_of_months / 12)} {year} to repay the loan!")
+            else:
+              print(f"It will take {math.floor(sum_of_months / 12)} {year} and {sum_of_months % 12} {month} to repay the loan!")
+            print(f"Overpayment = {round(sum_of_months * m - loan_principal)}")
+
+          elif calculation[0] == "annuity" and calculation[3] == None:
+            loan_principal = int(calculation[1])
+            p = int(calculation[2])
+            annuity = loan_principal * ((interest * math.pow((interest + 1), p))) / (pow(1 + interest, p) - 1) 
+            print(f'Your annuity payment = {math.ceil(annuity)}!')  
+            print(f"Overpayment = {math.ceil(annuity) * p - loan_principal}")
+
+        else:
+          print("Incorrect parameters")                  
+      else:
+        print("Incorrect parameters")
+    else:
+      print("Incorrect parameters")  
+else:
+  print("Incorrect parameters")
+  
