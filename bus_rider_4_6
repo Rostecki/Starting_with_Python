@@ -1,0 +1,120 @@
+import json
+import re
+
+#bus_data = json.loads(input())
+with open("bus_data", "r") as json_file:
+    bus_data = json.load(json_file)
+errors = {'bus_id': 0, 'stop_id': 0, 'stop_name': 0, 'next_stop': 0, 'stop_type': 0,'a_time': 0}
+bus_dict = {}
+
+def valid():
+    for bus in bus_data:
+        if re.match('\d{3}', str(bus['bus_id'])) is None:
+            errors['bus_id'] += 1
+        if re.match('\d+', str(bus['stop_id'])) is None:
+            errors['stop_id'] += 1
+        if re.match('\d+', str(bus['next_stop'])) is None:
+            errors['next_stop'] += 1
+        if re.match('[A-Z]\w+[ \w]* (Road|Avenue|Boulevard|Street)$', str(bus['stop_name'])) is None:
+            errors['stop_name'] += 1
+        if re.match('[0-2]\d:[0-5]\d$', str(bus['a_time'])) is None:
+            errors['a_time'] += 1
+        if re.match('[SOF]?$', str(bus['stop_type'])) is None:
+            errors['stop_type'] += 1
+    #print(type(bus['stop_type']))
+    # for key, value in errors.items():
+    #    if errors[key] == 0:
+    #        pass
+    #    else:
+    #        print(f'{key}: {value}')
+
+def bus_list_names():
+    global bus_dict
+    bus_names_list = []
+    for bus in bus_data:
+        if bus['bus_id'] not in bus_names_list:
+            bus_names_list.append(bus['bus_id'])
+            single_bus = {bus['bus_id']: 1}
+            bus_dict.update(single_bus)
+        else:
+            new_value = bus_dict[bus['bus_id']]
+            new_value += 1
+            single_bus = {bus['bus_id']: new_value}
+            bus_dict.update(single_bus)
+    print('Line names and number of stops:')
+    for key, value in bus_dict.items():
+        print(f'bus_id: {key}, stops: {value}')
+
+
+def stops_type():
+    bus_names_list = []
+    bus_start_list = []
+    bus_stop_list = []
+    bus_transfer_list = []
+    counter_stop = 0
+    counter_start = 0
+
+    # first one
+    for bus in bus_data[:1]:
+        bus_names_list.append(bus['bus_id'])
+        if bus['stop_type'] == 'S':
+            counter_start += 1
+            if bus['stop_name'] not in bus_start_list:
+                bus_start_list.append(bus['stop_name'])
+        elif bus['stop_type'] == 'F':
+            counter_stop += 1
+            if bus['stop_name'] not in bus_stop_list:
+                bus_stop_list.append(bus['stop_name'])
+        else:
+            bus_transfer_list.append(bus['stop_name'])
+    #laters
+    for bus in bus_data[1:]:
+        if bus['bus_id'] not in bus_names_list:
+            if counter_stop ==0 or counter_start ==0:
+                bus_names_list.append(bus['bus_id'])
+                indeks = bus_names_list.index(bus['bus_id'])
+                print(f"There is no start or end stop for the line: {bus_names_list[indeks-1]}")
+                print(counter_start, counter_stop)
+                print(f'Start stops: {len(bus_start_list)} {bus_start_list}')
+                print(f'Finish stops: {len(bus_stop_list)} {bus_stop_list}')
+                #exit()
+
+
+            if bus['stop_type'] == 'S':
+                counter_start += 1
+                if bus['stop_name'] not in bus_start_list:
+                    bus_start_list.append(bus['stop_name'])
+            elif bus['stop_type'] == 'F':
+                counter_stop += 1
+                if bus['stop_name'] not in bus_stop_list:
+                    bus_stop_list.append(bus['stop_name'])
+            else:
+                bus_transfer_list.append(bus['stop_name'])
+
+        else:
+            if bus['stop_type'] == 'S':
+                counter_start += 1
+                if bus['stop_name'] not in bus_start_list:
+                    bus_start_list.append(bus['stop_name'])
+            elif bus['stop_type'] == 'F':
+                counter_stop += 1
+                if bus['stop_name'] not in bus_stop_list:
+                    bus_stop_list.append(bus['stop_name'])
+            else:
+                bus_transfer_list.append(bus['stop_name'])
+
+        if counter_stop > 1 or counter_start > 1:
+            print(f"There is no start or end stop for the line: {bus['bus_id']}")
+            exit()
+
+
+    print(f'Start stops: {len(bus_start_list)} {bus_start_list}')
+    print(f'Finish stops: {len(bus_stop_list)} {bus_stop_list}')
+    print(bus_names_list)
+
+
+#valid()
+#bus_list_names()
+stops_type()
+
+
