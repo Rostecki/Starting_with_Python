@@ -1,0 +1,51 @@
+import json
+import requests
+
+curr_list = []
+my_dictionary = {}
+
+def currency_searcher(your_main):
+    global curr_list
+    global my_dictionary
+
+    r = requests.get(f'http://www.floatrates.com/daily/{your_main}.json')
+    json_string = r.text
+    my_dictionary = json.loads(json_string)
+    all_dict = my_dictionary
+    if your_main == 'usd':
+        pass
+    else:
+        curr_list.append(my_dictionary['usd']['code'])
+    if your_main == 'eur':
+        pass
+    else:
+        curr_list.append(my_dictionary['eur']['code'])
+
+
+def checking(your_currency, how_many):
+    global curr_list
+    global my_dictionary
+
+    print("Checking the cache...")
+    counter = 0
+    for curr in curr_list:
+        if curr == your_currency.upper():
+            counter += 1
+            if counter == 1:
+                print("Oh! It is in the cache!")
+                print(f"You received {round(how_many * my_dictionary[your_currency]['rate'],2)} {your_currency.upper()}.")
+
+    if counter == 0:
+        print("Sorry, but it is not in the cache!")
+        curr_list.append(your_currency.upper())
+        print(f"You received {round(how_many * my_dictionary[your_currency]['rate'],2)} {your_currency.upper()}.")
+
+
+your_main_currency = input().lower()
+currency_searcher(your_main_currency)
+while True:
+    currency_to_check = input().lower()
+    if currency_to_check == "":
+        break
+    ammount_of = int(input())
+    checking(currency_to_check, ammount_of)
