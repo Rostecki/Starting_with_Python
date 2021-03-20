@@ -1,0 +1,123 @@
+class Coffee:
+
+    def __init__(self):
+        self.supply = {'water': 400, 'milk': 540, 'beans': 120, 'cups': 9, 'money': 550}
+        self.name = None
+        self.choice = None
+        self.resource = None
+        self.action = None
+        self.water = 0
+        self.milk = 0
+        self.beans = 0
+        self.cups = 0
+
+    def your_input(self):
+        while True:
+            self.action = input("Write action (buy, fill, take, remaining, exit):\n")
+            if self.action == 'buy':
+                print('What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:')
+                self.action = input()
+                if self.action == 'back':
+                    pass
+                else:
+                    Coffee.calculating(self, self.supply, self.action)
+            elif self.action == 'fill':
+                print('Write how many ml of water do you want to add:')
+                water = int(input())
+                print('Write how many ml of milk do you want to add:')
+                milk = int(input())
+                print("Write how many grams of coffee beans do you want to add:")
+                beans = int(input())
+                print('Write how many disposable cups of coffee do you want to add:')
+                cups = int(input())
+                Coffee.fill(self, self.supply)
+            elif self.action == 'take':
+                Coffee.take(self, self.supply)
+            elif self.action == 'remaining':
+                Coffee.printing(self, self.supply)
+            else:
+                # print("Wrong action! Please retry")
+                break
+
+    def calculating(self, supply, action):
+        if self.action == '1':
+            if self.supply['water'] - 250 < 0:
+                self.resource = 'water'
+            if self.supply['beans'] - 16 < 0:
+                self.resource = 'coffee beans'
+            if self.supply['cups'] - 1 < 0:
+                self.resource = 'disposable cups'
+            if self.resource == None:
+                print('I have enough resources, making you a coffee!')
+                self.supply['water'] = self.supply['water'] - 250
+                self.supply['beans'] = self.supply['beans'] - 16
+                self.supply['cups'] -= 1
+                self.supply['money'] = self.supply['money'] + 4
+            else:
+                print(f"Sorry, not enough {self.resource}!")
+    
+        elif self.action == '2':
+            if self.supply['water'] - 350 < 0:
+                self.resource = 'water'
+            if self.supply['beans'] - 20 < 0:
+                self.resource = 'coffee beans'
+            if self.supply['milk'] - 75 < 0:
+                self.resource = 'milk'
+            if self.supply['cups'] - 1 < 0:
+                self.resource = 'disposable cups'
+            if self.resource == None:
+                print('I have enough resources, making you a coffee!')
+                self.supply['water'] = self.supply['water'] - 350
+                self.supply['beans'] = self.supply['beans'] - 20
+                self.supply['milk'] = self.supply['milk'] - 75
+                self.supply['cups'] -= 1
+                self.supply['money'] = self.supply['money'] + 7
+            else:
+                print(f"Sorry, not enough {self.resource}!")
+    
+        elif self.action == '3':
+            if self.supply['water'] - 200 < 0:
+                self.resource = 'water'
+            if self.supply['beans'] - 12 < 0:
+                self.resource = 'coffee beans'
+            if self.supply['milk'] - 100 < 0:
+                self.resource = 'milk'
+            if self.supply['cups'] - 1 < 0:
+                self.resource = 'disposable cups'
+            if self.resource == None:
+                print('I have enough resources, making you a coffee!')
+                self.supply['water'] = self.supply['water'] - 200
+                self.supply['beans'] = self.supply['beans'] - 12
+                self.supply['milk'] = self.supply['milk'] - 100
+                self.supply['cups'] -= 1
+                self.supply['money'] = self.supply['money'] + 6
+            else:
+                print(f"Sorry, not enough {self.resource}!")
+        return self.supply
+
+    def checking(self, supply):
+        decision = True
+        for key, value in supply.items():
+            if value < 0:
+                print(f"Sorry, not enough {key}!")
+                decision = False
+                break
+        print(decision)
+        return decision
+
+    def fill(self, supply):
+        self.supply['water'] = self.supply['water'] + self.water
+        self.supply['beans'] = self.supply['beans'] + self.beans
+        self.supply['milk'] = self.supply['milk'] + self.milk
+        self.supply['cups'] = self.supply['cups'] + self.cups
+        return self.supply
+
+    def take(self, supply):
+        print(f"I gave you ${self.supply['money']}\n")
+        self.supply['money'] = 0
+
+    def printing(self, supply):
+        print(f"\nThe coffee machine has:\n{self.supply['water']} of water\n{self.supply['milk']} of milk\n{self.supply['beans']} of coffee beans\n{self.supply['cups']} of dispodable cups\n${self.supply['money']} of money\n")
+
+new = Coffee()
+new.your_input()
