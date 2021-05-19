@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
+    <title>Mój quiz!</title>
+</head>
+<body>
+  <div class="back">
+      <h1>What is the capital of...</h1>
+      <div class="questions_area">
+          <div class="card">
+              <div>
+                <div class="fr"><p class="question">Meksyk</p></div>
+                <div class="ba"><p class="question">Meksyk</p></div>
+              </div>
+          </div>
+          <div class="card">
+              <div>
+                <div class="fr"><p class="question">Polska</p></div>
+                <div class="ba"><p class="question">Warszawa</p></div>
+              </div>
+          </div>
+          <div class="card">
+              <div>
+                <div class="fr"><p class="question">Niemcy</p></div>
+                <div class="ba"><p class="question">Berlin</p></div>
+              </div>
+          </div>
+          <div class="card">
+            <div>
+                  <div class="fr"><p class="question">Holandia</p></div>
+                  <div class="ba"><p class="question">Roterdam</p></div>
+            </div>
+          </div>
+          <div class="card">
+              <div>
+                  <div class="fr"><p class="question">Brazylia</p></div>
+                  <div class="ba"><p class="question">Brazylia</p></div>
+              </div>
+          </div>
+          <div class="card">
+            <div>
+              <div class="fr"><p class="question">Anglia</p></div>
+              <div class="ba"><p class="question">Londyn</p></div>
+            </div>
+          </div>
+          <div class="card">
+            <div>
+              <div class="fr"><p class="question">Włochy</p></div>
+              <div class="ba"><p class="question">Rzym</p></div>
+            </div>
+          </div>
+          <div class="card">
+            <div>
+              <div class="fr"><p class="question">Francja</p></div>
+              <div class="ba"><p class="question">Paryż</p></div>
+            </div>
+          </div>
+          <div class="card">
+            <div>
+              <div class="fr"><p class="question">Chiny</p></div>
+              <div class="ba"><p class="question">Pekin</p></div>
+            </div>
+          </div>
+      </div>
+  </div>
+
+</body>
+</html>
+src/style.css
+/*moje style*/
+
+.back {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /*justify-content: center;*/
+    background-image: url("world.png");
+    background-position: center;
+    background-size: cover;
+    height: 100vh;
+    width: 100vw;
+    /*position: relative;*/
+}
+
+.question {
+    font-family: 'Oswald', sans-serif;
+    color: coral;
+    font-size: 25px;
+}
+
+h1 {
+    font-family: 'Oswald', sans-serif;
+    color: coral;
+}
+
+.questions_area {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-items: center;
+    flex-wrap: wrap ;
+    height: 500px ;
+    width: 500px ;
+
+}
+
+.card {
+    position: relative;
+    height: 30%;
+    width: 30%;
+    margin: 8px;
+    /*border: solid;*/
+    transition: all 1s linear;
+    transform-style: preserve-3d;
+    }
+
+.card:hover {
+    transform: rotateY(180deg);
+    /*backface-visibility: visible;*/
+}
+
+.fr, .ba{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center ;
+    justify-content: center;
+    border-radius: 10px;
+
+    position: absolute;
+}
+.fr{
+    background-color: burlywood;
+    z-index: 2;
+    backface-visibility: hidden;
+}
+
+.ba {
+    background-color: wheat;
+    z-index: 1;
+    transform: rotateY(180deg);
+}
